@@ -226,7 +226,7 @@ public class CollapsingToolbarFragment extends Fragment implements OnMapReadyCal
 
             LatLngBounds bounds = new LatLngBounds.Builder().include(venueLocation).include(seatleLocation).build();
 
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 200);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, mapView.getWidth(),mapView.getHeight(),5);
             googleMap.moveCamera(cameraUpdate);
 
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);

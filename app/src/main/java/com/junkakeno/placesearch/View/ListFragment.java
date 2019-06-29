@@ -113,7 +113,9 @@ public class ListFragment extends Fragment{
     public void onResume() {
         super.onResume();
         Log.d(TAG,"onResume");
-        adapter.notifyDataSetChanged();
+        if(adapter!=null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
