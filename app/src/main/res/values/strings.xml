@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">PlaceSearch</string>
+    <string name="distance_unit_US">miles</string>
+    <string name="operation_status_open">Open</string>
+    <string name="operation_status_closed">Closed</string>
+    <string name="operation_status_unknown">Open status unknown</string>
+    <string name="detail_description_title">Description</string>
+    <string name="no_places_msg">There aren\'t \nany places to display</string>
+    <string name="land_screen_title">Find Places \nSeattle, WA</string>
+    <string name="search_box_hint">What are you looking for...</string>
+    <string name="error_alert_button">DISMISS</string>
+    <string name="date">20190101</string>
+    <string name="seattle_coordinates">47.6,-122.3</string>
+    <string name="area_radius">2000</string>
+
+    <string name="error_400_title">Error 400</string>
+    <string name="error_400_message">Bad request</string>
+    <string name="error_403_title">Error 403</string>
+    <string name="error_403_message">Hourly rate exceeded</string>
+    <string name="error_404_title">Error 404</string>
+    <string name="error_404_message">Not found. Endpoint doesn\'t exist.</string>
+    <string name="error_429_title">Error 429</string>
+    <string name="error_429_message">Quota exceeded</string>
+    <string name="error_500_title">Error 500</string>
+    <string name="error_500_message">Internal server error</string>
+
+    <string name="google_maps_key">AIzaSyAGKMQYpHEBWDIyZkXIcoG_cAb23wbyydY</string>
+</resources>
