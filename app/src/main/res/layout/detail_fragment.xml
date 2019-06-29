@@ -91,7 +91,6 @@
             android:autoLink="web"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:textColor="@color/colorLightBlue"
             android:hint="http://www.tacodelmar2028.com" />
 
         <TextView

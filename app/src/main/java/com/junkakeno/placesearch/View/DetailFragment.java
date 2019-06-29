@@ -26,9 +26,9 @@ import com.junkakeno.placesearch.Model.Detail.Detail;
 import com.junkakeno.placesearch.Model.Detail.Venue;
 import com.junkakeno.placesearch.R;
 
-public class CollapsingToolbarFragment extends Fragment implements OnMapReadyCallback {
+public class DetailFragment extends Fragment implements OnMapReadyCallback {
 
-    private static final String TAG = CollapsingToolbarFragment.class.getSimpleName();
+    private static final String TAG = DetailFragment.class.getSimpleName();
     private static final String ARG = "venueDetail";
 
     View view;
@@ -47,8 +47,8 @@ public class CollapsingToolbarFragment extends Fragment implements OnMapReadyCal
     Venue venue;
     InteractionListener listener;
 
-    public static CollapsingToolbarFragment newInstance(Detail venueDetail) {
-        CollapsingToolbarFragment fragment = new CollapsingToolbarFragment();
+    public static DetailFragment newInstance(Detail venueDetail) {
+        DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG, venueDetail);
         fragment.setArguments(args);
@@ -72,7 +72,7 @@ public class CollapsingToolbarFragment extends Fragment implements OnMapReadyCal
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG,"onCreateView");
 
-        view = inflater.inflate(R.layout.collapsing_toolbar_fragment,container,false);
+        view = inflater.inflate(R.layout.collapsing_toolbar,container,false);
         mapView = view.findViewById(R.id.map);
         name = view.findViewById(R.id.name);
         likes = view.findViewById(R.id.likes);

@@ -26,7 +26,4 @@
         android:background="@color/colorLightGray"
         android:queryHint="@string/search_box_hint"/>
 
-
-
-
 </RelativeLayout>

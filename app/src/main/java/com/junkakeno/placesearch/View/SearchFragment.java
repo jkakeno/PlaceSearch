@@ -20,7 +20,7 @@ import com.junkakeno.placesearch.R;
 
 public class SearchFragment extends Fragment {
 
-    private static final String TAG = CollapsingToolbarFragment.class.getSimpleName();
+    private static final String TAG = DetailFragment.class.getSimpleName();
 
     View view;
     TextView appName;

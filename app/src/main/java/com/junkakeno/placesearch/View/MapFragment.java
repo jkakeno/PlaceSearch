@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -19,6 +20,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.junkakeno.placesearch.Database.Database;
@@ -129,6 +131,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         googleMap.clear();
 
         if(mapView !=null){
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
             for (VenuesItem venue:venues){
                 double venueLat = venue.getLocation().getLat();
                 double venueLng = venue.getLocation().getLng();
@@ -140,9 +144,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 markerOptions.title(venueName);
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 googleMap.addMarker(markerOptions);
-                googleMap.moveCamera(CameraUpdateFactory.newLatLng(venueLocation));
-                googleMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+                builder.include(venueLocation);
             }
+
+            LatLngBounds bounds = builder.build();
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, mapView.getWidth(),mapView.getHeight(),100);
+            googleMap.moveCamera(cu);
         }
     }
 

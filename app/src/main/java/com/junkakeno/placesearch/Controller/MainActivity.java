@@ -1,5 +1,6 @@
 package com.junkakeno.placesearch.Controller;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,6 +10,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.junkakeno.placesearch.Database.Database;
 import com.junkakeno.placesearch.InteractionListener;
@@ -18,9 +21,10 @@ import com.junkakeno.placesearch.Model.List.VenuesItem;
 import com.junkakeno.placesearch.Network.ApiInterface;
 import com.junkakeno.placesearch.Network.ApiUtils;
 import com.junkakeno.placesearch.R;
-import com.junkakeno.placesearch.View.CollapsingToolbarFragment;
+import com.junkakeno.placesearch.View.DetailFragment;
 import com.junkakeno.placesearch.View.ListFragment;
 import com.junkakeno.placesearch.View.MapFragment;
+import com.junkakeno.placesearch.View.ProgressBarDialog;
 import com.junkakeno.placesearch.View.SearchFragment;
 
 import java.util.ArrayList;
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
     private static final String MAP_FRAGMENT = "mapFragment";
     private static final String RESULT = "result";
     private static final String VENUE_DETAIL = "venueDetail";
+    private static final String PROGRESS_DIALOG = "progress_dialog";
 
     FragmentManager fragmentManager;
     ApiInterface foursquareInterface;
@@ -49,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
     ArrayList<String> favoriteList;
     Disposable resultDisposable;
     Disposable detailDisposable;
+    ProgressBarDialog progressDialog = new ProgressBarDialog();
 
 
     @Override
@@ -81,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                     public void onSubscribe(Disposable d) {
                         Log.d(TAG,"Subscribed to get result");
                         resultDisposable = d;
+                        progressDialog.show(fragmentManager,PROGRESS_DIALOG);
                     }
 
                     @Override
@@ -91,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                     @Override
                     public void onError(Throwable e) {
                         Log.d(TAG,"Getting result error: " + e.getMessage());
+                        progressDialog.cancel();
                         showErrorDialog(e.getMessage());
                     }
 
@@ -103,6 +111,8 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                                 }
                             }
                         }
+
+                        progressDialog.cancel();
                         ListFragment coverListFragment = ListFragment.newInstance(foursquareResult);
                         fragmentManager.beginTransaction().replace(R.id.root, coverListFragment, LIST_FRAGMENT).addToBackStack(SEARCH_FRAGMENT).commit();
                     }
@@ -121,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                         public void onSubscribe(Disposable d) {
                             Log.d(TAG,"Subscribed to get detail");
                             detailDisposable = d;
+                            progressDialog.show(fragmentManager,PROGRESS_DIALOG);
                         }
 
                         @Override
@@ -131,14 +142,16 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                         @Override
                         public void onError(Throwable e) {
                             Log.d(TAG,"Getting detail error: " + e.getMessage());
+                            progressDialog.cancel();
                             showErrorDialog(e.getMessage());
                         }
 
                         @Override
                         public void onComplete() {
                             venueDetail.getResponse().getVenue().setFavorite(venuesItem.isFavorite());
-                            CollapsingToolbarFragment collapsingToolbarFragment = CollapsingToolbarFragment.newInstance(venueDetail);
-                            fragmentManager.beginTransaction().replace(R.id.root, collapsingToolbarFragment, DETAIL_FRAGMENT).addToBackStack(LIST_FRAGMENT).commit();
+                            progressDialog.cancel();
+                            DetailFragment detailFragment = DetailFragment.newInstance(venueDetail);
+                            fragmentManager.beginTransaction().replace(R.id.root, detailFragment, DETAIL_FRAGMENT).addToBackStack(LIST_FRAGMENT).commit();
                         }
                     });
         }
@@ -193,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                         public void onSubscribe(Disposable d) {
                             Log.d(TAG,"Subscribed to get detail");
                             detailDisposable = d;
+                            progressDialog.show(fragmentManager,PROGRESS_DIALOG);
                         }
 
                         @Override
@@ -203,14 +217,16 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                         @Override
                         public void onError(Throwable e) {
                             Log.d(TAG,"Getting detail error: " + e.getMessage());
+                            progressDialog.cancel();
                             showErrorDialog(e.getMessage());
                         }
 
                         @Override
                         public void onComplete() {
                             venueDetail.getResponse().getVenue().setFavorite(venuesItem.isFavorite());
-                            CollapsingToolbarFragment collapsingToolbarFragment = CollapsingToolbarFragment.newInstance(venueDetail);
-                            fragmentManager.beginTransaction().replace(R.id.root, collapsingToolbarFragment, DETAIL_FRAGMENT).addToBackStack(MAP_FRAGMENT).commit();
+                            progressDialog.cancel();
+                            DetailFragment detailFragment = DetailFragment.newInstance(venueDetail);
+                            fragmentManager.beginTransaction().replace(R.id.root, detailFragment, DETAIL_FRAGMENT).addToBackStack(MAP_FRAGMENT).commit();
                         }
                     });
         }
