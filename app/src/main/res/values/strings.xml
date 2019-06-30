@@ -14,15 +14,15 @@
     <string name="area_radius">2000</string>
 
     <string name="error_400_title">Error 400</string>
-    <string name="error_400_message">Bad request</string>
+    <string name="error_400_message">Bad request.</string>
     <string name="error_403_title">Error 403</string>
-    <string name="error_403_message">Hourly rate exceeded</string>
+    <string name="error_403_message">Hourly rate exceeded.</string>
     <string name="error_404_title">Error 404</string>
     <string name="error_404_message">Not found. Endpoint doesn\'t exist.</string>
     <string name="error_429_title">Error 429</string>
-    <string name="error_429_message">Quota exceeded</string>
+    <string name="error_429_message">You have exceeded the daily call quota. The daily call quota resets each day at midnight UTC. Please try again then.</string>
     <string name="error_500_title">Error 500</string>
-    <string name="error_500_message">Internal server error</string>
+    <string name="error_500_message">Internal server error. Foursquare’s servers are unhappy. The request is probably valid but needs to be retried later.</string>
 
     <string name="google_maps_key">AIzaSyAGKMQYpHEBWDIyZkXIcoG_cAb23wbyydY</string>
 </resources>

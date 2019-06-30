@@ -226,7 +226,7 @@ public class DetailFragment extends Fragment implements OnMapReadyCallback {
 
             LatLngBounds bounds = new LatLngBounds.Builder().include(venueLocation).include(seatleLocation).build();
 
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, mapView.getWidth(),mapView.getHeight(),5);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, mapView.getWidth(),mapView.getHeight(),70);
             googleMap.moveCamera(cameraUpdate);
 
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);

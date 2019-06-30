@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                         public void onSubscribe(Disposable d) {
                             Log.d(TAG,"Subscribed to get detail");
                             detailDisposable = d;
-                            progressDialog.show(fragmentManager,PROGRESS_DIALOG);
                         }
 
                         @Override
@@ -142,14 +141,12 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                         @Override
                         public void onError(Throwable e) {
                             Log.d(TAG,"Getting detail error: " + e.getMessage());
-                            progressDialog.cancel();
                             showErrorDialog(e.getMessage());
                         }
 
                         @Override
                         public void onComplete() {
                             venueDetail.getResponse().getVenue().setFavorite(venuesItem.isFavorite());
-                            progressDialog.cancel();
                             DetailFragment detailFragment = DetailFragment.newInstance(venueDetail);
                             fragmentManager.beginTransaction().replace(R.id.root, detailFragment, DETAIL_FRAGMENT).addToBackStack(LIST_FRAGMENT).commit();
                         }
@@ -206,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                         public void onSubscribe(Disposable d) {
                             Log.d(TAG,"Subscribed to get detail");
                             detailDisposable = d;
-                            progressDialog.show(fragmentManager,PROGRESS_DIALOG);
                         }
 
                         @Override
@@ -217,14 +213,12 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                         @Override
                         public void onError(Throwable e) {
                             Log.d(TAG,"Getting detail error: " + e.getMessage());
-                            progressDialog.cancel();
                             showErrorDialog(e.getMessage());
                         }
 
                         @Override
                         public void onComplete() {
                             venueDetail.getResponse().getVenue().setFavorite(venuesItem.isFavorite());
-                            progressDialog.cancel();
                             DetailFragment detailFragment = DetailFragment.newInstance(venueDetail);
                             fragmentManager.beginTransaction().replace(R.id.root, detailFragment, DETAIL_FRAGMENT).addToBackStack(MAP_FRAGMENT).commit();
                         }

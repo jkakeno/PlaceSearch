@@ -142,6 +142,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(venueLocation);
                 markerOptions.title(venueName);
+                markerOptions.snippet(venue.getId());
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 googleMap.addMarker(markerOptions);
                 builder.include(venueLocation);
@@ -156,8 +157,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onInfoWindowClick(Marker marker) {
         Log.d(TAG,"Marker clicked is: " + marker.getTitle());
+
         for (VenuesItem venue:venues){
-            if(venue.getName().equals(marker.getTitle())){
+            if(venue.getId().equals(marker.getSnippet())){
                 listener.onMarkerOptionSelectionInteraction(venue);
             }
         }
