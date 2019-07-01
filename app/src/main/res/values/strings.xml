@@ -12,6 +12,9 @@
     <string name="date">20190101</string>
     <string name="seattle_coordinates">47.6,-122.3</string>
     <string name="area_radius">2000</string>
+    <string name="no_tips_msg">There are no tips available</string>
+    <string name="detail_tips_title">Tips</string>
+    <string name="detail_stats_title">Stats</string>
 
     <string name="error_400_title">Error 400</string>
     <string name="error_400_message">Bad request.</string>

@@ -2,6 +2,7 @@ package com.junkakeno.placesearch.Network;
 
 import com.junkakeno.placesearch.Model.Detail.Detail;
 import com.junkakeno.placesearch.Model.List.Result;
+import com.junkakeno.placesearch.Model.Tips.Tips;
 
 import io.reactivex.Observable;
 import retrofit2.Call;
@@ -19,6 +20,9 @@ public interface ApiInterface {
     @GET("/v2/venues/search?client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRETE)
     Observable<Result> getResult(@Query("v") String yyymmdd, @Query("ll") String coordinates, @Query("radius") String radius, @Query("query") String query);
 
-    @GET("/v2/venues/{id}?v=20190101&client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRETE)
-    Observable<Detail> getDetails(@Path("id") String id);
+    @GET("/v2/venues/{id}?client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRETE)
+    Observable<Detail> getDetails(@Path("id") String id,@Query("v") String yyymmdd);
+
+    @GET("/v2/venues/{id}/tips?client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRETE)
+    Observable<Tips> getTips(@Path("id") String venueId,@Query("v") String yyymmdd);
 }

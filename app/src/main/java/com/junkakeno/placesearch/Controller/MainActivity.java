@@ -16,8 +16,10 @@ import android.widget.ProgressBar;
 import com.junkakeno.placesearch.Database.Database;
 import com.junkakeno.placesearch.InteractionListener;
 import com.junkakeno.placesearch.Model.Detail.Detail;
+import com.junkakeno.placesearch.Model.DetailAndTips;
 import com.junkakeno.placesearch.Model.List.Result;
 import com.junkakeno.placesearch.Model.List.VenuesItem;
+import com.junkakeno.placesearch.Model.Tips.Tips;
 import com.junkakeno.placesearch.Network.ApiInterface;
 import com.junkakeno.placesearch.Network.ApiUtils;
 import com.junkakeno.placesearch.R;
@@ -29,9 +31,12 @@ import com.junkakeno.placesearch.View.SearchFragment;
 
 import java.util.ArrayList;
 
+import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements InteractionListener{
@@ -50,10 +55,12 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
     ApiInterface foursquareInterface;
     Result foursquareResult;
     Detail venueDetail;
+    Tips venueTips;
     Database db;
     ArrayList<String> favoriteList;
     Disposable resultDisposable;
     Disposable detailDisposable;
+    Disposable detailAndTipsDisposable;
     ProgressBarDialog progressDialog = new ProgressBarDialog();
 
 
@@ -122,37 +129,7 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
     @Override
     public void onListItemSelectionInteraction(final VenuesItem venuesItem) {
         Log.d(TAG,"Venue selected is: " + venuesItem.getName() + venuesItem.getId());
-
-        if(venuesItem.getId()!=null){
-            foursquareInterface.getDetails(venuesItem.getId())
-                    .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<Detail>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-                            Log.d(TAG,"Subscribed to get detail");
-                            detailDisposable = d;
-                        }
-
-                        @Override
-                        public void onNext(Detail detail) {
-                            venueDetail = detail;
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.d(TAG,"Getting detail error: " + e.getMessage());
-                            showErrorDialog(e.getMessage());
-                        }
-
-                        @Override
-                        public void onComplete() {
-                            venueDetail.getResponse().getVenue().setFavorite(venuesItem.isFavorite());
-                            DetailFragment detailFragment = DetailFragment.newInstance(venueDetail);
-                            fragmentManager.beginTransaction().replace(R.id.root, detailFragment, DETAIL_FRAGMENT).addToBackStack(LIST_FRAGMENT).commit();
-                        }
-                    });
-        }
-
+        getVenueDetails(venuesItem);
     }
 
     @Override
@@ -195,34 +172,56 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
     public void onMarkerOptionSelectionInteraction(final VenuesItem venuesItem) {
         Log.d(TAG,"Venue selected is: " + venuesItem.getName() + venuesItem.getId());
 
+        getVenueDetails(venuesItem);
+
+    }
+
+    public void getVenueDetails(final VenuesItem venuesItem){
         if(venuesItem.getId()!=null) {
-            foursquareInterface.getDetails(venuesItem.getId())
-                    .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<Detail>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-                            Log.d(TAG,"Subscribed to get detail");
-                            detailDisposable = d;
-                        }
 
-                        @Override
-                        public void onNext(Detail detail) {
-                            venueDetail = detail;
-                        }
+            /*Get an observable apod object when calling apod api.*/
+            Observable<Detail> detailsObservable = foursquareInterface.getDetails(venuesItem.getId(),getResources().getString(R.string.date)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.d(TAG,"Getting detail error: " + e.getMessage());
-                            showErrorDialog(e.getMessage());
-                        }
+            /*Get an observable epic object when calling epic api.*/
+            Observable<Tips> tipsObservable = foursquareInterface.getTips(venuesItem.getId(),getResources().getString(R.string.date)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
-                        @Override
-                        public void onComplete() {
-                            venueDetail.getResponse().getVenue().setFavorite(venuesItem.isFavorite());
-                            DetailFragment detailFragment = DetailFragment.newInstance(venueDetail);
-                            fragmentManager.beginTransaction().replace(R.id.root, detailFragment, DETAIL_FRAGMENT).addToBackStack(MAP_FRAGMENT).commit();
-                        }
-                    });
+            /*Combine the 2 observables apod and epic.*/
+            Observable<DetailAndTips> combinedObservable = Observable.zip(detailsObservable, tipsObservable, new BiFunction<Detail, Tips, DetailAndTips>() {
+                @Override
+                public DetailAndTips apply(Detail detail, Tips tips) throws Exception {
+                    return new DetailAndTips(detail, tips);
+                }
+            });
+
+            combinedObservable.subscribe(new Observer<DetailAndTips>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    Log.d(TAG, "Subscribed to get detail and tips");
+                    detailAndTipsDisposable = d;
+                }
+
+                @Override
+                public void onNext(DetailAndTips detailAndTips) {
+                    venueDetail = detailAndTips.getDetail();
+                    venueTips = detailAndTips.getTips();
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.d(TAG, "Getting detail and tips error: " + e.getMessage());
+                    showErrorDialog(e.getMessage());
+                }
+
+                @Override
+                public void onComplete() {
+
+                    venueDetail.getResponse().getVenue().setFavorite(venuesItem.isFavorite());
+
+                    DetailFragment detailFragment = DetailFragment.newInstance(venueDetail, venueTips);
+                    fragmentManager.beginTransaction().replace(R.id.root, detailFragment, DETAIL_FRAGMENT).addToBackStack(LIST_FRAGMENT).commit();
+
+                }
+            });
         }
     }
 
@@ -243,8 +242,15 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        resultDisposable.dispose();
-        detailDisposable.dispose();
+        if(resultDisposable!=null) {
+            resultDisposable.dispose();
+        }
+        if(detailDisposable!=null) {
+            detailDisposable.dispose();
+        }
+        if(detailAndTipsDisposable!=null){
+            detailAndTipsDisposable.dispose();
+        }
     }
 
     private void showErrorDialog(String type) {

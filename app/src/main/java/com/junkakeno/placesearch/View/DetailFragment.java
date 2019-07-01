@@ -4,10 +4,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -24,12 +27,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.junkakeno.placesearch.InteractionListener;
 import com.junkakeno.placesearch.Model.Detail.Detail;
 import com.junkakeno.placesearch.Model.Detail.Venue;
+import com.junkakeno.placesearch.Model.Tips.ItemsItem;
+import com.junkakeno.placesearch.Model.Tips.Tips;
 import com.junkakeno.placesearch.R;
+
+import java.util.List;
 
 public class DetailFragment extends Fragment implements OnMapReadyCallback {
 
     private static final String TAG = DetailFragment.class.getSimpleName();
-    private static final String ARG = "venueDetail";
+    private static final String ARG1 = "venueDetail";
+    private static final String ARG2 = "venueTips";
 
     View view;
     TextView name;
@@ -39,18 +47,31 @@ public class DetailFragment extends Fragment implements OnMapReadyCallback {
     TextView address;
     TextView description;
     TextView web;
+    TextView checkinCount;
+    TextView visitCount;
+    TextView usersCount;
+    TextView noTipMsg;
+    ImageView checkinIcon;
+    ImageView visitIcon;
+    ImageView usersIcon;
     RatingBar ratingBar;
     ToggleButton favorite;
     MapView mapView;
     GoogleMap googleMap;
     Detail venueDetail;
+    Tips venueTips;
     Venue venue;
+    List<ItemsItem> tips;
     InteractionListener listener;
+    RecyclerView recyclerView;
+    TipAdapter adapter;
+    LinearLayoutManager layoutManager;
 
-    public static DetailFragment newInstance(Detail venueDetail) {
+    public static DetailFragment newInstance(Detail venueDetail, Tips venueTips) {
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG, venueDetail);
+        args.putParcelable(ARG1, venueDetail);
+        args.putParcelable(ARG2, venueTips);
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,9 +81,13 @@ public class DetailFragment extends Fragment implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         Log.d(TAG,"onCreate");
         if (getArguments() != null) {
-            venueDetail = getArguments().getParcelable(ARG);
+            venueDetail = getArguments().getParcelable(ARG1);
+            venueTips = getArguments().getParcelable(ARG2);
             if(venueDetail!=null) {
                 venue = venueDetail.getResponse().getVenue();
+            }
+            if(venueTips!=null){
+                tips = venueTips.getResponse().getTips().getItems();
             }
         }
     }
@@ -83,6 +108,12 @@ public class DetailFragment extends Fragment implements OnMapReadyCallback {
         ratingBar = view.findViewById(R.id.rating);
         favorite = view.findViewById(R.id.favorite);
         web = view.findViewById(R.id.web);
+        checkinCount = view.findViewById(R.id.check_count);
+        visitCount = view.findViewById(R.id.visit_count);
+        usersCount = view.findViewById(R.id.user_count);
+        noTipMsg = view.findViewById(R.id.no_tips_msg);
+        recyclerView = view.findViewById(R.id.tip_recycler_view);
+        noTipMsg.setVisibility(View.VISIBLE);
 
         return view;
 
@@ -177,6 +208,12 @@ public class DetailFragment extends Fragment implements OnMapReadyCallback {
             favorite.setChecked(false);
         }
 
+        if(venue.getStats()!=null){
+            checkinCount.setText(String.valueOf(venue.getStats().getCheckinsCount()));
+            visitCount.setText(String.valueOf(venue.getStats().getVisitsCount()));
+            usersCount.setText(String.valueOf(venue.getStats().getUsersCount()));
+        }
+
         favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -187,6 +224,15 @@ public class DetailFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
+
+        if(!tips.isEmpty()){
+            noTipMsg.setVisibility(View.INVISIBLE);
+
+            adapter = new TipAdapter(getActivity(), tips);
+            layoutManager = new LinearLayoutManager(getActivity());
+            recyclerView.setAdapter(adapter);
+            recyclerView.setLayoutManager(layoutManager);
+        }
     }
 
     @Override
